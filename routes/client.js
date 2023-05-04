@@ -2,17 +2,22 @@ const express = require('express')
 const router = express.Router()
 
 const {
-    createclient,
+    resetpassword,
     updateclient,
     getclient,
-    requesttranslation
+    requesttranslation,
+    gettranslationrequests,
+    deleterequest
 
 
-}=require('../controllers/clientscontroller')
+} = require('../controllers/clientscontroller')
 
-router.post('/createclient', createclient)
-router.post('/updateclient/:id', updateclient)
+
+router.post('/updateclient', updateclient)
 router.post('/getclient', getclient)
-router.post('/requesttrans/:id', requesttranslation)
+router.post('/resetpassword', resetpassword)
+router.post('/requesttrans', requesttranslation)
+router.get('/getreq', gettranslationrequests)
+router.post('/deleteReq', deleterequest)
 
 module.exports = router

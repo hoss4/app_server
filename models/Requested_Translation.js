@@ -17,7 +17,7 @@ const reqtransSchema = new Schema({
         type: String,
         required: true,
     },
-    overphone: {
+    onthephone: {
         type: Boolean,
         required: true,
     },
@@ -30,8 +30,8 @@ const reqtransSchema = new Schema({
         required: true,
     },
     time: {
-        type: String,
-        required: false,
+        type: Date,
+        required: true,
     }   
 
 

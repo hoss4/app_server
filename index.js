@@ -2,7 +2,6 @@ require('dotenv').config();
 
 const express =require('express');
 const mongoose = require('mongoose');
-
 const auth=require('./middleware/auth');
 const errors=require('./middleware/errors');
 const {unless} = require('express-unless');
@@ -16,8 +15,7 @@ mongoose.promise = global.Promise;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
+//connect to mongoDB
 mongoose.connect(process.env.MONGO_URL,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -29,9 +27,11 @@ mongoose.connect(process.env.MONGO_URL,{
 
    )
 
+// what does this following line do?
 
 
 auth.authenticatetoken.unless= unless;
+
 app.use(
   auth.authenticatetoken.unless({
     path: [
@@ -41,9 +41,9 @@ app.use(
     })
 )
 
-
 app.use('/api/user',userRoute);
-app.use(errors.errorHandler)
+app.use(errors.errorHandler);
 app.use('/api/client', clientsroute)
 app.use('/api/admin', adminsroute)
 app.use('/api/translator', translatorsroute)
+

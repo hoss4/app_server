@@ -21,10 +21,11 @@ function generateAccessToken(id){
     return jwt.sign({data:id},process.env.ACCESS_TOKEN_SECRET,
         {expiresIn:'3h'});
 }
-function getToken(header)
+function getToken(req)
 {
-    if(header){
-        const token=header.split(' ')[1];
+    const authHeader=req.headers['authorization'];
+    if(authHeader){
+        const token=authHeader.split(' ')[1];
         return token;
     }
     else{
@@ -34,7 +35,7 @@ function getToken(header)
 
 function getUserIdFromToken(token) {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(decoded);
+   ;
     return decoded.data;
   }
 
