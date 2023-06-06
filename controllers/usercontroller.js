@@ -8,6 +8,7 @@ const Admin = require('../models/Admin');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const crypto = require("crypto");
+require('dotenv').config();
   
 
 const sendPasswordResetEmail = async (email,type) => {
@@ -20,8 +21,9 @@ const sendPasswordResetEmail = async (email,type) => {
       host: 'smtp.gmail.com',
       port: 587,
       auth: {
-        user: 'mohamed2001hoss@gmail.com',
-        pass: 'qhmmeykzlseluqhb',
+        user: process.env.EMAIL,
+        //pass: 'qhmmeykzlseluqhb',
+        pass: process.env.PASSWORD,
       },
     });
 
