@@ -11,7 +11,7 @@ function authenticatetoken(req,res,next){
     
     jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,user)=>{
         if(err){
-            return res.sendStatus(403);
+            return res.sendStatus(403);         
         }
         req.user=user;
         next();
@@ -35,7 +35,7 @@ function getToken(req)
 
 function getUserIdFromToken(token) {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-   ;
+   
     return decoded.data;
   }
 

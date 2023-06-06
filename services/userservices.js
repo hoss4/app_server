@@ -1,7 +1,6 @@
 const Client = require('../models/Client');
 const Admin = require('../models/Admin');
 const Translator = require('../models/Translator');
-
 const bcrypt = require('bcryptjs');
 const auth = require('../middleware/auth');
 const validator = require("validator");

@@ -36,6 +36,11 @@ const translatorSchema = new Schema({
         required: false,
         default: [],
     }, 
+    passwordResetCode:{
+        type: Number,
+        required: false,
+        default: -1
+    },
 
 }, {timestamps : true} )
 
@@ -44,10 +49,10 @@ translatorSchema.set(
     {
         transform:(document, returnedObject)=> {
         returnedObject.id = returnedObject._id.toString();
-        //returnedObject.type = "client";
         delete returnedObject._id;
         delete returnedObject.__v;
         delete returnedObject.password;
+        delete returnedObject.passwordResetCode;
         },
     }
 )

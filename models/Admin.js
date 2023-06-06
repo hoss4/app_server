@@ -25,6 +25,11 @@ const adminSchema = new Schema({
         type: [String],
         required: false,
     }, 
+    passwordResetCode:{
+        type: Number,
+        required: false,
+        default: -1
+    },
 
 }, {timestamps : true} )
 
@@ -36,6 +41,7 @@ adminSchema.set(
         delete returnedObject._id;
         delete returnedObject.__v;
         delete returnedObject.password;
+        delete returnedObject.passwordResetCode;
         },
     }
 )

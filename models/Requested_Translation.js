@@ -29,15 +29,7 @@ const reqtransSchema = new Schema({
         type: Date,
         required: true,
     },
-    time: {
-        type: Date,
-        required: true,
-    }   
 
-
-
-
-    
 
 }, {timestamps : true} )
 

@@ -1,10 +1,104 @@
 const bycrptjs = require('bcryptjs');
 const userService = require('../services/userservices');
-const auth = require('../middleware/auth');
 require('dotenv').config()
 const validator = require("validator");
 const Client = require('../models/Client');
+const Translator = require('../models/Translator');
+const Admin = require('../models/Admin');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
+const crypto = require("crypto");
+  
 
+const sendPasswordResetEmail = async (email,type) => {
+  try {
+   var code= crypto.randomInt(100000000).toString().padStart(7, '0');
+
+    // Create a SMTP transporter object
+    const transporter = nodemailer.createTransport({
+      // Replace with your SMTP server details
+      host: 'smtp.gmail.com',
+      port: 587,
+      auth: {
+        user: 'mohamed2001hoss@gmail.com',
+        pass: 'qhmmeykzlseluqhb',
+      },
+    });
+
+    // Define the email message
+    const message = {
+      from: 'mohamed2001hoss@gmail.com',
+      to: email,
+      subject: 'Password Reset Request',
+      text: `Dear User, here is your password reset code : ${code}`,
+    };
+
+    // Send the email
+    await transporter.sendMail(message);
+    if(type=="client"){
+      var client = await Client.findOne({ email: email });
+      client.passwordResetCode=code;
+      client.save();
+      return "200" ;
+    }
+    if(type=="translator"){
+      var translator = await Translator.findOne({ email: email });
+      translator.passwordResetCode=code;
+      translator.save();
+      return "200" ;
+    }
+    if(type=="admin"){
+      var admin = await Admin.findOne({ email: email });
+      admin.passwordResetCode=code;
+      admin.save();
+      return "200" ;
+    }
+
+  
+  } catch (error) {
+   console.log(error)
+    return "400" ;
+   
+  }
+};
+
+exports.checkCode = async (req, res) => {
+  try {
+    const { email, type, code } = req.body;
+    
+    if (type == "client"){
+        var client = await Client.findOne({ email: email });
+        if (client.passwordResetCode == code) {
+          return res.status(200).json({ status: "200", message: 'code is correct' });
+        }
+        else {
+          return res.status(400).json({ status: "400", message: 'code is incorrect' });
+        }
+    }
+
+    if (type == "translator"){
+      var translator = await Translator.findOne({ email: email });
+        if (translator.passwordResetCode == code) {
+          return res.status(200).json({ status: "200", message: 'code is correct' });
+        }
+        else {
+          return res.status(400).json({ status: "400", message: 'code is incorrect' });
+        }
+    }
+
+    if (type == "admin"){
+      var admin = await Admin.findOne({ email: email });
+      if (admin.passwordResetCode == code) {
+        return res.status(200).json({ status: "200", message: 'code is correct' });
+      }
+      else {
+        return res.status(400).json({ status: "400", message: 'code is incorrect' });
+      }
+    }
+  } catch (error) {
+    return res.status(400).json({ status: "400", message: 'error' });
+  }
+}
 
 exports.register = (req, res, next) => {
   const { password } = req.body;
@@ -46,52 +140,121 @@ exports.login = (req, res, next) => {
 
   });
 }
-exports.userProfile = (req, res, next) => {
-  //   const authHeader=req.headers['authorization'];
-  //   const token= auth.getToken(authHeader)
-  //   if(token==null){
-  //     console.log("here");
-  //   }else{
-  // console.log(token);
-  // const id = auth.getUserIdFromToken(token);
-  //   console.log(id)
-  //   }
-  //console.log('here');
-  return res.status(200).json({ message: "Authorized USER" });
-}
 
-
-const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+exports.forgotPassword = async (req, res, next) => {
   try {
-    const user = await Client.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    const { email, username } = req.body;
+
+    // Find user with the provided email
+
+    var user = username.split('.');
+    var type = user[0];
+    if (type == "client") {
+      var client = await Client.findOne({ username: username });
+      if (client) {
+        if (client.email == email) {
+          var result = await sendPasswordResetEmail(client.email,type);
+         
+          if(result=='200'){
+            return res.status(200).json({ status: "200", message: 'Password reset email sent' }); 
+         }else{
+             var status = result;
+            return res.status(status).json({ status: status, message: 'email not sent' });
+         }
+        } else {
+          return res.status(404).json({ status: "404", message: 'Incorrect Email' });
+        }
+      } else {
+        return res.status(404).json({ status: "404", message: 'client not found' });
+      }
     }
-    const token = await createtoken(user._id);
+    if (type == "translator") {
+      var translator = await Translator.findOne({ username: username });
+      if (translator) {
+        if (translator.email == email) {
+          var result =await sendPasswordResetEmail(translator.email,type);
+          if(result=='200'){
+            return res.status(200).json({ status: "200", message: 'Password reset email sent' }); 
+         }else{
+              var status = result;
+            return res.status(status).json({ status: status, message: 'email not sent' });
+         }
+        } else {
+          return res.status(404).json({ status: "404", message: 'Incorrect Email' });
+        }
+      } else {
+        return res.status(404).json({ status: "404", message: 'translator not found' });
+      }
+    }
+    if (type == "admin") {
+      var admin = await Admin.findOne({ username: username });
+      if (admin) {
+        if (admin.email == email) {
 
-    const url = `http://localhost:5000/api/users/changepassword/` + token;
-    const url2 = `http://localhost:3000/forgotpassword/` + token;
+          var result = await sendPasswordResetEmail(admin.email,type);
+           if(result=='200'){
+            
+              return res.status(200).json({ status: "200", message: 'Password reset email sent' }); 
+           }else{
+               var status = result
+              return res.status(status).json({ status: status, message: 'email not sent' });
+           }
+      
 
-    nodeoutlook.sendEmail({
-      auth: {
-        user: process.env.EMAIL, // Your email must be same outlook email
-        pass: process.env.PASSWORD,
-      },
-      from: process.env.EMAIL,
-      to: email,
-      subject: "Reset Password",
-      html: `<h1>DONOT FORGOT PASSWORD AGAIN</h1>
-          <p>Click on the link below to reset your password</p>
-          <a href=${url2}>${url2}</a>`,
-      onError: (e) => console.log(e),
-      onSuccess: (i) => console.log(i),
-    });
-
-    res.status(200).json({ url });
+        } else {
+          return res.status(404).json({ status: "404", message: 'Incorrect Email' });
+        }
+      } else {
+        return res.status(404).json({ status: "404", message: 'admin not found' });
+      }
+    }
   } catch (error) {
-    res.status(400).json({ error: error.message });
+   return res.status(400).json({ status: "400", message: error.message });
   }
 };
 
+exports.changepassword = async (req, res) => {
+  try {
+    const { email, type, password } = req.body;
+    const salt = bcrypt.genSaltSync(10);
+    newpass = bcrypt.hashSync(password, salt);
+    
+    if (type == "client"){
+        var client = await Client.findOne({ email: email });
+        if (client) {  
+          client.password = newpass;
+          client.save();
+         res.status(200).json({ status: "200", message: 'password changed successfully' });
+        }else{
+          return res.status(404).json({ status: "404", message: 'client not found' });
+        }
+    }
 
+    if (type == "translator"){
+      var translator = await Translator.findOne({ email: email });
+      if (translator) {
+        translator.password = newpass;
+        translator.save();
+       res.status(200).json({ status: "200", message: 'password changed successfully' });
+      }else{
+        return res.status(404).json({ status: "404", message: 'translator not found' });
+      }
+    }
+
+    if (type == "admin"){
+      var admin = await Admin.findOne({ email: email });
+      if (admin) {
+        admin.password = newpass;
+        admin.save();
+       res.status(200).json({ status: "200", message: 'password changed successfully' });
+      }else{
+        return res.status(404).json({ status: "404", message: 'admin not found' });
+      }
+    }
+  } catch (error) {
+    return res.status(400).json({ status: "400", message: 'error' });
+  }
+
+}
+
+  

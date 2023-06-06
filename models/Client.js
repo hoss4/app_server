@@ -32,6 +32,11 @@ const clientSchema = new Schema({
         type: [String],
         required: false,
     }, 
+    passwordResetCode:{
+        type: Number,
+        required: false,
+        default: -1
+    },
 
 }, {timestamps : true} )
 
@@ -43,6 +48,7 @@ clientSchema.set(
         delete returnedObject._id;
         delete returnedObject.__v;
         delete returnedObject.password;
+        delete returnedObject.passwordResetCode;
        
         },
     }

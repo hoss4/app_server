@@ -7,9 +7,11 @@ const {
     getclient,
     requesttranslation,
     gettranslationrequests,
-    deleterequest
-
-
+    deleterequest,
+    getoldtranslations,
+    getupcomingtranslations,
+    CancelApp,
+    
 } = require('../controllers/clientscontroller')
 
 
@@ -19,5 +21,9 @@ router.post('/resetpassword', resetpassword)
 router.post('/requesttrans', requesttranslation)
 router.get('/getreq', gettranslationrequests)
 router.post('/deleteReq', deleterequest)
+router.get('/getoldtranslations', getoldtranslations)
+router.get('/getupcomingtranslations', getupcomingtranslations)
+router.post('/CancelApp', CancelApp)
+
 
 module.exports = router
