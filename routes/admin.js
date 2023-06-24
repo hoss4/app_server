@@ -12,6 +12,8 @@ const{
        getupcomingtranslations,
        getoldtranslations,
        CancelApp,
+       getAssignedRequests,
+       unassignrequest
 }
 =require('../controllers/adminscontroller')
 
@@ -26,6 +28,8 @@ router.post('/AssignedRequest', AssignedRequest)
 router.get('/getupcomingtranslations', getupcomingtranslations)
 router.get('/getoldtranslations', getoldtranslations)
 router.post('/CancelApp', CancelApp)
+router.get('/getAssignedRequests', getAssignedRequests)
+router.post('/unassignrequest', unassignrequest)
 
 
 module.exports = router

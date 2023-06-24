@@ -21,10 +21,6 @@ const adminSchema = new Schema({
         type: String,
         required: true,
     },
-    acceptedrequests: {
-        type: [String],
-        required: false,
-    }, 
     passwordResetCode:{
         type: Number,
         required: false,

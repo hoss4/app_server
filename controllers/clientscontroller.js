@@ -26,6 +26,15 @@ const updateclient = async (req, res) => {
     if (!validator.isEmail(email)) {
         return res.status(404).send({ message: "Email entered is not a valid Email", status: "404" });
     }
+    const checkuser = await Client.findOne({ username: username });
+    if (checkuser && checkuser._id != id) {
+        return res.status(404).send({ message: "Username is already used", status: "404" });
+    }
+    const checkemail = await Client.findOne({ email: email });
+    if (checkemail && checkemail._id != id) {
+        return res.status(404).send({ message: "Email is already used", status: "404" });
+    }
+    
     try {
         const client = await Client.findByIdAndUpdate(id, {
             email: email,
@@ -118,10 +127,7 @@ const requesttranslation = async (req, res) => {
         })
 
         console.log(request.clientid, request._id)
-        const client = await Client.findByIdAndUpdate(id, {
-            $push: { reqtrans: request._id }
-        })
-        console.log(client)
+    
 
         res.status(200).json({ message: "translation requested successfully", status: "200" })
 
@@ -165,9 +171,7 @@ const deleterequest = async (req, res) => {
     console.log(id, requestid)
     try {
         const request = await RequestedTranslation.findByIdAndDelete(requestid);
-        const client = await Client.findByIdAndUpdate(id, {
-            $pull: { reqtrans: requestid }
-        })
+       
         res.status(200).json({ message: "Appointement has been succesfully removed", status: "200" });
 
     } catch (error) {

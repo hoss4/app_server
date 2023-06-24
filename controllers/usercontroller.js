@@ -8,12 +8,42 @@ const Admin = require('../models/Admin');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const crypto = require("crypto");
-require('dotenv').config();
-  
+ 
+
+
+
+exports.sendEmail = async (email,title, mess) => {
+  try{
+    const transporter = nodemailer.createTransport({
+      // Replace with your SMTP server details
+      host: 'smtp.gmail.com',
+      port: 587,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
+      },
+    });
+    const message = {
+      from: 'mohamed2001hoss@gmail.com',
+      to: email,
+      subject: title,
+      text: mess,
+    };
+
+    // Send the email
+    await transporter.sendMail(message);
+    return "200"
+  }catch(error){
+    console.log(error)
+    return "400"
+    }
+}
 
 const sendPasswordResetEmail = async (email,type) => {
   try {
-   var code= crypto.randomInt(100000000).toString().padStart(7, '0');
+   var code= crypto.randomInt(100000000).toString().padStart(8, '0');
+  
+   console.log(code)
 
     // Create a SMTP transporter object
     const transporter = nodemailer.createTransport({
@@ -22,7 +52,6 @@ const sendPasswordResetEmail = async (email,type) => {
       port: 587,
       auth: {
         user: process.env.EMAIL,
-        //pass: 'qhmmeykzlseluqhb',
         pass: process.env.PASSWORD,
       },
     });
@@ -258,5 +287,7 @@ exports.changepassword = async (req, res) => {
   }
 
 }
+
+
 
   

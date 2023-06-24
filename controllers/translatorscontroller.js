@@ -6,7 +6,7 @@ const AssignedTranslation = require('../models/Assigned_Requests')
 const Client = require('../models/Client')
 const AcceptedTranslation = require('../models/Accepted_Translations')
 const RequestedTranslation = require('../models/Requested_Translation')
-
+const {sendEmail}=require('./usercontroller')
 
 
 
@@ -144,7 +144,6 @@ const addLanguage = async (req, res) => {
     }
 }
 
-
 const removeLanguage = async (req, res) => {
     const token = auth.getToken(req)
     if (token == null) {
@@ -190,6 +189,9 @@ const acceptrequest = async (req, res) => {
             })
             accepted.save();
             assigned.delete();
+            const client = await Client.findById(assigned.clientid);
+            const mess='Dear '+client.name+',\n\nYour translation request has been accepted by a translator, please check your account for more details. \n\nBest Regards,\nTranslation Team'
+            sendEmail(client.email, "Request Accepted", mess)
             res.status(200).send({ "message": "translation accepted successfully", status: "200" });
 
         }

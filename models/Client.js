@@ -21,17 +21,6 @@ const clientSchema = new Schema({
         type: String,
         required: true,
     },
-    reqtrans: {
-        type: [{
-            type: Schema.Types.ObjectId,
-            ref: 'RequiredTranslations'
-        }],
-        required: false,
-    }, 
-    acctrans: {
-        type: [String],
-        required: false,
-    }, 
     passwordResetCode:{
         type: Number,
         required: false,

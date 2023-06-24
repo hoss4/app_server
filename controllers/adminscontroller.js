@@ -7,6 +7,7 @@ const RequestedTranslation = require('../models/Requested_Translation')
 const AssignedTranslation = require('../models/Assigned_Requests')
 const AcceptedTranslation = require('../models/Accepted_Translations')
 const Client = require('../models/Client')
+const {sendEmail}=require('./usercontroller')
 
 
 
@@ -182,6 +183,7 @@ const getalltranslationrequests = async (req, res) => {
         for (let i = 0; i < translationrequests.length; i++) {
 
             var clientid = translationrequests[i].clientid.toString();
+            console.log(clientid)
             clientname = await Client.findById(clientid).select('name');
             finaltranslationrequests.push({ clientname: clientname.name, ...translationrequests[i].toObject() });
 
@@ -191,6 +193,7 @@ const getalltranslationrequests = async (req, res) => {
         res.status(200).send(finaltranslationrequests);
     }
     catch (error) {
+        console.log(error)
         res.status(400).json({ message: error.message, status: "400" })
     }
 }
@@ -229,6 +232,9 @@ const AssignedRequest = async (req, res) => {
             Assign.save();
             translation.delete();
             console.log(Assign)
+            const translator = await Translator.findById(translatorid);
+            const mess='Dear '+translator.name+', \n\nyou have been assigned a translation request, please check your account for more details.\n\nBest Regards,\nTranslation Team'
+            sendEmail(translator.email, "Translation Request", mess)
             res.status(200).send({ "message": "translation assigned successfully", status: "200" });
 
         }
@@ -303,6 +309,66 @@ const CancelApp = async (req, res) => {
 
 }
 
+
+const getAssignedRequests = async (req, res) => {
+   
+    var clientname = '';
+    var translatorname = '';
+    var finaltranslationrequests = [];
+    try {
+        const requests = await AssignedTranslation.find({});
+        for (let i = 0; i < requests.length; i++) {
+
+            var clientid = requests[i].clientid.toString();
+            var translatorid = requests[i].translatorid.toString();
+            console.log("request : ",requests[i])
+           
+            clientname = await Client.findById(clientid).select('name');
+            translatorname = await Translator.findById(translatorid).select('name');
+            console.log("clientname : ",clientname)
+      
+            finaltranslationrequests.push({ clientname: clientname.name,translatorname:translatorname.name ,...requests[i].toObject() });
+
+
+        }
+        console.log(finaltranslationrequests)
+        res.status(200).json(finaltranslationrequests);
+
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
+const unassignrequest = async (req, res) => {
+
+    const translationid = req.body.translationid;
+    try {
+        const assigned = await AssignedTranslation.findById(translationid);
+        if (assigned) {
+            const requested = new RequestedTranslation ({
+                clientid: assigned.clientid,
+                fromlang: assigned.fromlang,
+                tolang: assigned.tolang,
+                onthephone: assigned.onthephone,
+                inperson: assigned.inperson,
+                date: assigned.date,
+                createdAt: assigned.created,
+
+            })
+            requested.save();
+            assigned.delete();
+            res.status(200).send({ "message": "translation Rejected successfully", status: "200" });
+
+        }
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message, status: "400" })
+
+    }
+
+}
+
+
 module.exports = {
     createTranslator,
     createAdmin,
@@ -315,5 +381,7 @@ module.exports = {
     getupcomingtranslations,
     getoldtranslations,
     CancelApp,
+    getAssignedRequests,
+    unassignrequest,
 
 }

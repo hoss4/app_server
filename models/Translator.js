@@ -26,16 +26,6 @@ const translatorSchema = new Schema({
         required: false,
         default: [],
     },   
-    reqtrans: {
-        type: [{type: mongoose.Types.ObjectId, ref:'RequestedTranslations'}],
-        required: false,
-        default: [],
-    }, 
-    schedtrans: {
-        type: [String],
-        required: false,
-        default: [],
-    }, 
     passwordResetCode:{
         type: Number,
         required: false,
